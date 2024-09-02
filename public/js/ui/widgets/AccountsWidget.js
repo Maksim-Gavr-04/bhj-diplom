@@ -37,7 +37,7 @@ class AccountsWidget {
       createAccountModal.open();
     });
 
-    const arrOfAccounts = [...this.element.querySelectorAll('.account')];
+    const arrOfAccounts = [...document.querySelectorAll('.account')];
     arrOfAccounts.forEach(account => {
       account.addEventListener('click', () => this.onSelectAccount(account));
     });
