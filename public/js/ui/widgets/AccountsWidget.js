@@ -5,27 +5,42 @@
 
 class AccountsWidget {
   /**
-   * Устанавливает текущий элемент в свойство element
+   * Устанавливает текущий элемент в свойство element.
    * Регистрирует обработчики событий с помощью
-   * AccountsWidget.registerEvents()
+   * AccountsWidget.registerEvents().
    * Вызывает AccountsWidget.update() для получения
-   * списка счетов и последующего отображения
+   * списка счетов и последующего отображения.
    * Если переданный элемент не существует,
    * необходимо выкинуть ошибку.
    * */
-  constructor( element ) {
+  constructor(element) {
+    if (!element) throw new Error('Передан пустой элемент!');
+    
+    this.element = element;
 
+    this.registerEvents();
+    this.update();
+    
   }
 
   /**
    * При нажатии на .create-account открывает окно
-   * #modal-new-account для создания нового счёта
+   * #modal-new-account для создания нового счёта.
    * При нажатии на один из существующих счетов
    * (которые отображены в боковой колонке),
    * вызывает AccountsWidget.onSelectAccount()
    * */
   registerEvents() {
+    const createAccount = document.querySelector('.create-account');
+    createAccount.addEventListener('click', () => {
+      const createAccountModal = App.getModal('createAccount');
+      createAccountModal.open();
+    });
 
+    const arrOfAccounts = [...this.element.querySelectorAll('.account')];
+    arrOfAccounts.forEach(account => {
+      account.addEventListener('click', () => this.onSelectAccount(account));
+    });
   }
 
   /**
@@ -39,7 +54,15 @@ class AccountsWidget {
    * метода renderItem()
    * */
   update() {
+    if (!User.current()) return;
 
+    Account.list({}, (err, response) => {
+      if (response.success && !err) {
+        this.clear();
+        const arrOfAccountsInResponse = [...response.data];
+        arrOfAccountsInResponse.forEach(account => this.renderItem(account));
+      }
+    });
   }
 
   /**
@@ -48,18 +71,25 @@ class AccountsWidget {
    * в боковой колонке
    * */
   clear() {
-
+    const arrOfAccounts = [...document.querySelectorAll('.account')];
+    arrOfAccounts.forEach(account => account.remove());
   }
 
   /**
-   * Срабатывает в момент выбора счёта
+   * Срабатывает в момент выбора счёта.
    * Устанавливает текущему выбранному элементу счёта
-   * класс .active. Удаляет ранее выбранному элементу
-   * счёта класс .active.
+   * класс .active Удаляет ранее выбранному элементу
+   * счёта класс .active
    * Вызывает App.showPage( 'transactions', { account_id: id_счёта });
    * */
-  onSelectAccount( element ) {
+  onSelectAccount(element) {
+    const activeAccount = document.querySelector('.active.account');
+    if (activeAccount) {
+      activeAccount.classList.remove('active');
+    }
 
+    element.classList.add('active');
+    App.showPage('transactions', { account_id: element.dataset.id });
   }
 
   /**
@@ -67,8 +97,15 @@ class AccountsWidget {
    * отображения в боковой колонке.
    * item - объект с данными о счёте
    * */
-  getAccountHTML(item){
+  getAccountHTML(item) {
+    const accountHTML = `
+      <li class="account" data-id="${item.id}">
+        <a href="#">
+          <span>${item.name}</span> / <span>${item.sum} ₽</span>
+        </a>
+      </li>`;
 
+    return accountHTML;
   }
 
   /**
@@ -77,7 +114,7 @@ class AccountsWidget {
    * AccountsWidget.getAccountHTML HTML-код элемента
    * и добавляет его внутрь элемента виджета
    * */
-  renderItem(data){
-
+  renderItem(data) {
+    this.element.innerHTML += this.getAccountHTML(data);
   }
 }
