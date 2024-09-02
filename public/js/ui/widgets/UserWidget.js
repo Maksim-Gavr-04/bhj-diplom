@@ -9,10 +9,12 @@ class UserWidget {
    * Устанавливает полученный элемент
    * в свойство element.
    * Если переданный элемент не существует,
-   * необходимо выкинуть ошибку.
+   * необходимо выкинуть ошибку
    * */
-  constructor(element){
-
+  constructor(element) {
+    if (!element) throw new Error('Передан пустой элемент!');
+    
+    this.element = element;
   }
 
   /**
@@ -22,7 +24,8 @@ class UserWidget {
    * в элемент .user-name устанавливает имя
    * авторизованного пользователя
    * */
-  update(){
-
+  update() {
+    const userName = document.querySelector('.user-name');
+    userName.textContent = User.current().name;
   }
 }
