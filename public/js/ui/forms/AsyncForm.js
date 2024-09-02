@@ -5,6 +5,7 @@
  * с таких форм собираются и передаются в метод onSubmit
  * для последующей обработки
  * */
+
 class AsyncForm {
   /**
    * Если переданный элемент не существует,
@@ -13,7 +14,10 @@ class AsyncForm {
    * через registerEvents()
    * */
   constructor(element) {
-
+    if (!element) throw new Error('Передан пустой элемент!');
+    
+    this.element = element;
+    this.registerEvents();
   }
 
   /**
@@ -21,7 +25,10 @@ class AsyncForm {
    * вызывает метод submit()
    * */
   registerEvents() {
-
+    this.element.addEventListener('submit', (event) => {
+      event.preventDefault();
+      this.submit();
+    });
   }
 
   /**
@@ -32,11 +39,15 @@ class AsyncForm {
    * }
    * */
   getData() {
+    const formData = new FormData(this.element);
 
+    let data = {/* email: 'test@test.ru', password: '****' */};
+    formData.entries().forEach(([name, value]) => data[name] = value);
+    return data;
   }
 
-  onSubmit(options){
-
+  onSubmit(options) {
+    
   }
 
   /**
@@ -44,6 +55,6 @@ class AsyncForm {
    * данные, полученные из метода getData()
    * */
   submit() {
-
+    this.onSubmit(this.getData());
   }
 }
