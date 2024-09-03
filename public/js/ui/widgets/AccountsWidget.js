@@ -20,7 +20,6 @@ class AccountsWidget {
 
     this.registerEvents();
     this.update();
-    
   }
 
   /**
@@ -32,12 +31,13 @@ class AccountsWidget {
    * */
   registerEvents() {
     const createAccount = document.querySelector('.create-account');
+    const arrOfAccounts = [...document.querySelectorAll('.account')];
+
     createAccount.addEventListener('click', () => {
       const createAccountModal = App.getModal('createAccount');
       createAccountModal.open();
     });
 
-    const arrOfAccounts = [...document.querySelectorAll('.account')];
     arrOfAccounts.forEach(account => {
       account.addEventListener('click', () => this.onSelectAccount(account));
     });
@@ -56,8 +56,8 @@ class AccountsWidget {
   update() {
     if (!User.current()) return;
 
-    Account.list({}, (err, response) => {
-      if (response.success && !err) {
+    Account.list(null, (err, response) => {
+      if (response.success) {
         this.clear();
         const arrOfAccountsInResponse = [...response.data];
         arrOfAccountsInResponse.forEach(account => this.renderItem(account));
@@ -84,9 +84,7 @@ class AccountsWidget {
    * */
   onSelectAccount(element) {
     const activeAccount = document.querySelector('.active.account');
-    if (activeAccount) {
-      activeAccount.classList.remove('active');
-    }
+    if (activeAccount) activeAccount.classList.remove('active');
 
     element.classList.add('active');
     App.showPage('transactions', { account_id: element.dataset.id });
