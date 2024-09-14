@@ -32,13 +32,15 @@ class TransactionsPage {
    * TransactionsPage.removeAccount соответственно
    * */
   registerEvents() {
-    const accountRemoveButton = document.querySelector('.remove-account');
-    const arrOfTransactionRemoveButtons = [...document.querySelectorAll('.transaction__remove')];
+    this.element.addEventListener('click', (e) => {
+      const accountRemoveButton = e.target.closest('.remove-account');
+      const removeTransactionButton = e.target.closest('.transaction__remove');
 
-    accountRemoveButton.addEventListener('click', () => this.removeAccount());
-
-    arrOfTransactionRemoveButtons.forEach(button => {
-      button.addEventListener('click', () => this.removeTransaction(button.dataset.id));
+      if (accountRemoveButton) {
+        this.removeAccount();
+      } else if (removeTransactionButton) {
+        this.removeTransaction(removeTransactionButton.dataset.id);
+      }
     });
   }
 
